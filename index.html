@@ -1,0 +1,20 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>IPIR+SP client (wasm)</title>
+<style>body{font:14px/1.4 ui-monospace,monospace;margin:16px}pre{white-space:pre-wrap}</style>
+<h1>IPIR+SP client round trip (C-ABI wasm)</h1>
+<pre id="out">running…</pre>
+<script type="module">
+  import { runAll } from "./ps-wasm.mjs";
+  const out = document.getElementById("out");
+  try {
+    const bytes = await (await fetch("pss-ipir.wasm")).arrayBuffer();
+    const extra = () => (performance.memory ? { jsHeapBytes: performance.memory.usedJSHeapSize } : {});
+    const reports = await runAll(location.origin, bytes, "web-browser", 7, extra);
+    out.textContent = reports.map((r) => JSON.stringify(r)).join("\n");
+    document.title = reports.every((r) => r.match) ? "PASS" : "FAIL";
+  } catch (e) {
+    out.textContent = "error: " + e.stack;
+    document.title = "ERROR";
+  }
+</script>
